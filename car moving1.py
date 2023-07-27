@@ -26,7 +26,7 @@ level = 1
 level2 = 2
 
 mixer.music.load("Swamps Nature.wav")
-mixer.music.play(-1)  # play non-stop
+mixer.music.play(0)  # play non-stop -1 is continuous play
 
 
 
