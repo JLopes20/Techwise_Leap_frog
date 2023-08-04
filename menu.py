@@ -71,7 +71,7 @@ def handle_button_click(mouse_pos):
         click_Sound.play()
         stop_Music()
 
-        subprocess.call(["python3", "car moving1.py"])
+        subprocess.Popen(["python3", "car moving1.py"])
 
         # switch to the gameplay screen
         run_gameplay_screen()
@@ -89,6 +89,7 @@ def run_gameplay_screen():
         draw_gameplay_screen()
 
         pygame.display.flip()  # Update the display
+    return running
 
 def background_image():
     
@@ -127,6 +128,7 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # Left mouse button
                     handle_button_click(pygame.mouse.get_pos())
