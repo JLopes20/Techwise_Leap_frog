@@ -1,6 +1,20 @@
 import pygame
-import subprocess #allows you to run other Python scripts
+from pygame import mixer
+import subprocess #allows you to run other Python scripts. Needed to link to game when you click start button.
 pygame.init()
+pygame.mixer.init()
+
+#Mp3 file
+mp3_file = "sounds/background.mp3"
+pygame.mixer.music.load(mp3_file)
+
+#play the music
+pygame.mixer.music.play()
+pygame.mixer.music.set_volume(0.5)
+
+#stop the music 
+def stop_Music(): 
+    pygame.mixer.music.stop()
 
 
 screen_width = 800
@@ -11,6 +25,10 @@ pygame.display.set_caption("Menu Screen")
 # Define colors
 GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
+
+#Background sound
+mixer.music.load('sounds/background.mp3')
+mixer.music.play()
 
 # Function to draw the menu with the buttons
 def draw_menu():
@@ -49,7 +67,9 @@ def handle_button_click(mouse_pos):
     quit_button_x, quit_button_y, quit_button_width, quit_button_height = screen_width // 2 - 100, 400, 200, 50
 
     if start_button_x <= mouse_pos[0] <= start_button_x + start_button_width and start_button_y <= mouse_pos[1] <= start_button_y + start_button_height:
-        #print("Start button clicked!")
+        click_Sound = mixer.Sound('sounds/click.wav')
+        click_Sound.play()
+        stop_Music()
 
         subprocess.call(["python3", "car moving1.py"])
 
