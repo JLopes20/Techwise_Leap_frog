@@ -213,6 +213,47 @@ for i in range(6):
     car.image = pygame.transform.scale(car.image, (150, 150))  # Scale the image to the desired dimensions
     cars.add(car)
 
+class Log(pygame.sprite.Sprite):
+    def __init__(self, image_path, pos_x, pos_y, speed):
+        super().__init__()
+        self.image_path = pygame.image.load(image_path).convert()
+        self.image = self.image_path
+        self.rect = self.image.get_rect()
+        self.rect.x = pos_x
+        self.rect.y = pos_y
+        self.speed = speed
+        self.player = None  # Player attribute
+
+    def set_player(self, player):
+        self.player = player
+
+    def update(self):
+        self.rect.x += self.speed
+        if self.speed > 0 and self.rect.left > SCREEN_WIDTH:
+            self.reset_position()
+        elif self.speed < 0 and self.rect.right < 0:
+            self.reset_position()
+
+        # Check for collision between player and logs
+        if self.player is not None:  # Check if the player is set
+            player_on_log = pygame.sprite.collide_mask(self.player, self)
+            if player_on_log:
+                self.player.move(self.speed, 0)
+
+    def reset_position(self):
+        if self.speed > 0:
+            self.rect.right = 0
+        else:
+            self.rect.left = SCREEN_WIDTH
+
+    def carry_player(self, player):
+        if self.speed > 0:
+            player.move(self.speed, 0)
+        else:
+            player.move(self.speed, 0)
+
+    def get_mask(self):
+        return pygame.mask.from_surface(self.image)
 
 class New_level(pygame.sprite.Sprite): # snippet of image on top of screen taking player to second background
     def __init__(self, pos_x, pos_y):
@@ -362,7 +403,7 @@ alligator = Gator(100, 500)
 
 health_bar = Health_bar(player, screen)
 
-# Create sprite groups with ordem of apperance 
+# Create sprite groups with order of apperance 
 background_sprites = pygame.sprite.LayeredUpdates()
 background_sprites.add(background_sprites,cars, new_level)  # Background sprites should be drawn first
 
@@ -377,21 +418,70 @@ lake_sprites = pygame.sprite.LayeredUpdates()
 alligators_sprites = pygame.sprite.LayeredUpdates()
 alligators_sprites.add(alligator)
 
-all_sprites = pygame.sprite.LayeredUpdates()
-all_sprites.add(background_sprites, player_sprites, car_sprites)
+logs_group = pygame.sprite.Group()
+logs_second_screen = pygame.sprite.Group()
+logs_group.add(logs_second_screen)
 
+for i in range(5):
+    image_path = "Images/log.png"
+    pos_x = random.randint(100, 300)
+    pos_y = 300 + i * 95
+    speed = random.randint(5, 10)
+    log = Log(image_path, pos_x, pos_y, speed)
+    log.image = pygame.image.load(image_path).convert()
+    log.image.set_colorkey(0, 0)
+    log.image = pygame.transform.scale(log.image, (150, 50))
+    logs_second_screen.add(log)
+
+log.set_player(player)
+
+logs_hit_second_screen = pygame.sprite.spritecollide(player, logs_second_screen, False, pygame.sprite.collide_mask)
+
+for i in range(5):
+    image_path = "Images/log.png"
+    pos_x = random.randint(100, 300)
+    pos_y = 300 + i * 95
+    # Adjust the spacing between logs
+    speed = random.randint(5, 10)
+    # Random speed for logs
+
+    log = Log(image_path, pos_x, pos_y, speed)
+    log.image = pygame.image.load(image_path).convert()
+    # Load the image
+    log.image.set_colorkey(0, 0)
+    # Remove the background
+    log.image = pygame.transform.scale(log.image, (150, 50))
+    # Scale the image to the desired dimensions
+
+    logs_second_screen.add(log)
+
+all_sprites = pygame.sprite.LayeredUpdates()
+all_sprites.add(background_sprites, player_sprites, car_sprites, logs_second_screen)
 
 scroll_x = 0
 scroll_y = 0
-current_background = road_bg
+current_background = 'Images/road_bg'
   
 
-#main loop
+#main game loop
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+    if player.frog_position[1] >= BG_ROAD_SIZE:
+        #REMOVE IF OK player.frog_position[1] = BG_ROAD_SIZE - 1  # Move the frog back just before the transition
+        player.current_sprite = 0
+        current_background = swamp_bg
+
+    # Update the current_background based on the player's location
+    if player.frog_position[1] >= BG_ROAD_SIZE:
+        current_background = swamp_bg
+        player.current_sprite = 0  # Move the frog back to the first sprite when transitioning
+    else:
+        current_background = road_bg
+
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_RIGHT]:
@@ -419,10 +509,6 @@ while running:
         player.move_down()
        
 
-    if player.frog_position[0] >= BG_ROAD_SIZE:
-       current_background = swamp_bg
-
-
     # Check for collision between player and cars
     for car in cars:
         if pygame.sprite.collide_mask(player, car):
@@ -434,6 +520,12 @@ while running:
                 elif player.health == 0 and player.lives == 0:
                     player.alive = False
 
+    # Check for collision between player and logs
+    if player.frog_position[0] >= BG_ROAD_SIZE:  # Check if the frog is on the second screen
+        for log in logs_second_screen:
+            if pygame.sprite.collide_mask(player, log):
+                player.move(log.speed, 0)
+  
     
       # Check for collision between player and new_level
     if player.rect.colliderect(new_level.rect):
@@ -487,6 +579,8 @@ while running:
     all_sprites.draw(screen)
     health_bar.update()
     player.update()
+    logs_group.update()  # Update logs based on player position
+    logs_group.draw(screen)  # Draw logs based on player position
 
     pygame.display.flip()
     clock.tick(60)
