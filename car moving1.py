@@ -22,6 +22,7 @@ BG_ROAD_SIZE = 1080
 
 BG_SWAMP_SIZE = 1080
 
+current_background = 'Images/road_bg'
 
 mixer.music.load("Images/Swamps Nature.wav")
 mixer.music.play(-1)  # play non-stop
@@ -213,47 +214,7 @@ for i in range(6):
     car.image = pygame.transform.scale(car.image, (150, 150))  # Scale the image to the desired dimensions
     cars.add(car)
 
-class Log(pygame.sprite.Sprite):
-    def __init__(self, image_path, pos_x, pos_y, speed):
-        super().__init__()
-        self.image_path = pygame.image.load(image_path).convert()
-        self.image = self.image_path
-        self.rect = self.image.get_rect()
-        self.rect.x = pos_x
-        self.rect.y = pos_y
-        self.speed = speed
-        self.player = None  # Player attribute
 
-    def set_player(self, player):
-        self.player = player
-
-    def update(self):
-        self.rect.x += self.speed
-        if self.speed > 0 and self.rect.left > SCREEN_WIDTH:
-            self.reset_position()
-        elif self.speed < 0 and self.rect.right < 0:
-            self.reset_position()
-
-        # Check for collision between player and logs
-        if self.player is not None:  # Check if the player is set
-            player_on_log = pygame.sprite.collide_mask(self.player, self)
-            if player_on_log:
-                self.player.move(self.speed, 0)
-
-    def reset_position(self):
-        if self.speed > 0:
-            self.rect.right = 0
-        else:
-            self.rect.left = SCREEN_WIDTH
-
-    def carry_player(self, player):
-        if self.speed > 0:
-            player.move(self.speed, 0)
-        else:
-            player.move(self.speed, 0)
-
-    def get_mask(self):
-        return pygame.mask.from_surface(self.image)
 
 class New_level(pygame.sprite.Sprite): # snippet of image on top of screen taking player to second background
     def __init__(self, pos_x, pos_y):
@@ -342,7 +303,60 @@ class Gator(pygame.sprite.Sprite):
     def get_mask(self):
         return pygame.mask.from_surface(self.image)
 
+class Log(pygame.sprite.Sprite):
+    def __init__(self, image_path, pos_x, pos_y, speed):
+        super().__init__()
+        self.image_path = pygame.image.load(image_path).convert()
+        self.image = self.image_path
+        self.rect = self.image.get_rect()
+        self.rect.x = pos_x
+        self.rect.y = pos_y
+        self.speed = speed
+        self.player = None  # Player attribute
+        self.image = pygame.transform.scale(self.image, (150, 75))
+        self.image.set_colorkey((0, 0, 0))
+        self.visible = current_background == 'Images/swamp_bg'
 
+    def set_player(self, player):
+        self.player = player
+
+    def update(self):
+        if current_background == 'Images/swamp_bg':
+            self.rect.x += self.speed
+            if self.speed > 0 and self.rect.left > SCREEN_WIDTH:
+                self.reset_position()
+            elif self.speed < 0 and self.rect.right < 0:
+                self.reset_position()
+
+        # Check for collision between player and logs
+        if self.player is not None:  # Check if the player is set
+            player_on_log = pygame.sprite.collide_mask(self.player, self)
+            if player_on_log:
+                self.player.move(self.speed, 0)
+
+    def reset_position(self):
+        if self.speed > 0:
+            self.rect.right = 0
+        else:
+            self.rect.left = SCREEN_WIDTH
+
+    def carry_player(self, player):
+        if self.speed > 0:
+            player.move(self.speed, 0)
+        else:
+            player.move(self.speed, 0)
+
+    def get_mask(self):
+        return pygame.mask.from_surface(self.image)
+    
+log1 = Log("Images/log.png", random.randint(100, 300), random.randint(300, 490), random.randint(5, 10))
+log2 = Log("Images/log.png", random.randint(100, 300), random.randint(300, 490), random.randint(5, 10))
+log3 = Log("Images/log.png", random.randint(100, 300), random.randint(300, 490), random.randint(5, 10))
+
+player = Player(Player.frog_position[0], Player.frog_position[1])
+log1.set_player(player)
+log2.set_player(player)
+log3.set_player(player)
 
 class Health_bar:
     def __init__(self, player, screen):
@@ -400,9 +414,9 @@ new_level = New_level(0, 0)
 lake = Lake(-2, 255)
 player = Player(Player.frog_position[0], Player.frog_position[1])
 alligator = Gator(100, 500)
-
 health_bar = Health_bar(player, screen)
 
+  
 # Create sprite groups with order of apperance 
 background_sprites = pygame.sprite.LayeredUpdates()
 background_sprites.add(background_sprites,cars, new_level)  # Background sprites should be drawn first
@@ -420,7 +434,7 @@ alligators_sprites.add(alligator)
 
 logs_group = pygame.sprite.Group()
 logs_second_screen = pygame.sprite.Group()
-logs_group.add(logs_second_screen)
+logs_group.add(log1, log2, log3)
 
 for i in range(5):
     image_path = "Images/log.png"
@@ -435,7 +449,7 @@ for i in range(5):
 
 log.set_player(player)
 
-logs_hit_second_screen = pygame.sprite.spritecollide(player, logs_second_screen, False, pygame.sprite.collide_mask)
+logs_hit_second_screen = pygame.sprite.spritecollide(player, logs_group, False, pygame.sprite.collide_mask)
 
 for i in range(5):
     image_path = "Images/log.png"
@@ -456,12 +470,10 @@ for i in range(5):
     logs_second_screen.add(log)
 
 all_sprites = pygame.sprite.LayeredUpdates()
-all_sprites.add(background_sprites, player_sprites, car_sprites, logs_second_screen)
+all_sprites.add(background_sprites, player_sprites, car_sprites, log1, log2, log3)
 
 scroll_x = 0
 scroll_y = 0
-current_background = 'Images/road_bg'
-  
 
 #main game loop
 running = True
@@ -579,8 +591,6 @@ while running:
     all_sprites.draw(screen)
     health_bar.update()
     player.update()
-    logs_group.update()  # Update logs based on player position
-    logs_group.draw(screen)  # Draw logs based on player position
 
     pygame.display.flip()
     clock.tick(60)
