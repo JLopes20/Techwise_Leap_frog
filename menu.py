@@ -27,7 +27,7 @@ GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 
 #Background sound
-mixer.music.load('sounds/background.mp3')
+mixer.music.load('sounds/Music4.mp3')
 mixer.music.play()
 
 # Function to draw the menu with the buttons
