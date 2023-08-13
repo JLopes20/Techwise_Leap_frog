@@ -28,6 +28,14 @@ BG_SWAMP_SIZE = 1080
 current_background = pygame.image.load('Images/road2.jpg').convert()
 current_background = pygame.transform.scale(current_background, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
+def update_background_images():
+    global road_bg, swamp_bg, current_background
+
+    road_bg = pygame.transform.scale(road_bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
+    swamp_bg = pygame.transform.scale(swamp_bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
+    current_background = pygame.transform.scale(current_background, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+
 mixer.music.load("Images/Swamps Nature.wav")
 mixer.music.play(-1)  # play non-stop
 
@@ -458,6 +466,11 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.VIDEORESIZE:
+            SCREEN_WIDTH, SCREEN_HEIGHT = event.w, event.h
+            screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.RESIZABLE)
+            update_background_images()
+            screen.blit(current_background, (0, 0))
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_RIGHT]:

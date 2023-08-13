@@ -98,26 +98,19 @@ def background_image():
     # Load the background image
     background_image = pygame.image.load('Images/menu-background2.jpg') 
 
-    # Get the size of the background image
-    image_width, image_height = background_image.get_size()
-
-    # Calculate the scaling factors to fit the window size
-    scale_width = screen_width / image_width
-    scale_height = screen_height / image_height
-    scale_factor = min(scale_width, scale_height)
-
-    # Scale the background image to fit the window
-    scaled_width = int(image_width * scale_factor)
-    scaled_height = int(image_height * scale_factor)
-    background_image = pygame.transform.scale(background_image, (scaled_width, scaled_height))
-
     # Resize the background image to fit the screen
-    background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
+    background_image = pygame.transform.scale(background_image, (screen.get_width(), screen.get_height()))
 
     # Blit the background image on the screen
     screen.blit(background_image, (0, 0))
 
     pygame.display.flip()  # Update the display
+
+# Function to handle window resize event
+def handle_resize_event(event):
+    global screen
+    screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
+    background_image() 
 
 def main():
     running = True
@@ -133,6 +126,10 @@ def main():
                     if(user_choice == 1):
                         # User has pressed Start, start game
                         return
+
+            elif event.type == pygame.VIDEORESIZE:  # Handle window resize event
+                handle_resize_event(event)
+
         draw_menu() #Puts background and text together
 
         pygame.display.flip()  # Update the display
