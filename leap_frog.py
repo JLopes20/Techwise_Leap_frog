@@ -77,21 +77,29 @@ class Player(pygame.sprite.Sprite):
         if self.rect.x < SCREEN_WIDTH - self.rect.width:
             self.direction = "right"
             self.move(3, 0)
+            Jump_sound = mixer.Sound("Sounds/Frog-ribbit.mp3")
+            Jump_sound.play()
 
     def move_left(self):
         if self.rect.x > 0:
             self.direction = "left"
             self.move(-3, 0)
+            Jump_sound = mixer.Sound("Sounds/Frog-ribbit.mp3")
+            Jump_sound.play()
 
     def move_up(self):
         if self.rect.y > 0:
             self.direction = "up"
             self.move(0, -3)
+            Jump_sound = mixer.Sound("Sounds/Frog-ribbit.mp3")
+            Jump_sound.play()
 
     def move_down(self):
         if self.rect.y < SCREEN_HEIGHT - self.rect.height:
             self.direction = "down"
             self.move(0, 3)
+            Jump_sound = mixer.Sound("Sounds/Frog-ribbit.mp3")
+            Jump_sound.play()
 
     def animate(self):
         self.is_animating = True
