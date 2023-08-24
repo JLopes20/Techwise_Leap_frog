@@ -45,6 +45,15 @@ def draw_menu():
     quit_text = font.render("Quit", True, GREEN)
     screen.blit(quit_text, (quit_button_x + quit_button_width // 2 - quit_text.get_width() // 2, quit_button_y + quit_button_height // 2 - quit_text.get_height() // 2))
 
+    # Draw the credits button
+    credits_button_width, credits_button_height = 200, 50
+    credits_button_x = screen_width // 2 - credits_button_width // 2
+    credits_button_y = 500
+    pygame.draw.rect(screen, BLACK, (credits_button_x, credits_button_y, credits_button_width, credits_button_height))
+    credits_text = font.render("Credits", True, GREEN)
+    screen.blit(credits_text, (credits_button_x + credits_button_width // 2 - credits_text.get_width() // 2, credits_button_y + credits_button_height // 2 - credits_text.get_height() // 2))
+
+
     pygame.display.flip()  # Update the display
 
 # Function to draw the gameplay screen
@@ -65,6 +74,11 @@ def handle_button_click(mouse_pos):
     quit_button_width = 200
     quit_button_height = 50
 
+    credits_button_x = screen_width // 2 - 100
+    credits_button_y = 400
+    credits_button_width = 200
+    credits_button_height = 50
+
     is_mouse_over_start_button_x = start_button_x <= mouse_pos[0] <= start_button_x + start_button_width
     is_mouse_over_start_button_y = start_button_y <= mouse_pos[1] <= start_button_y + start_button_height
 
@@ -82,6 +96,17 @@ def handle_button_click(mouse_pos):
     if is_mouse_over_quit_button_x and is_mouse_over_quit_button_y:
         pygame.quit()
         quit()
+
+    # Check if the mouse is over the credits button
+    is_mouse_over_credits_button_x = credits_button_x <= mouse_pos[0] <= credits_button_x + credits_button_width
+    is_mouse_over_credits_button_y = credits_button_y <= mouse_pos[1] <= credits_button_y + credits_button_height
+
+    if is_mouse_over_credits_button_x and is_mouse_over_credits_button_y:
+        click_Sound = mixer.Sound('sounds/click.wav')
+        click_Sound.play()
+        
+        # DISPLAY CREDITS HERE
+        print("Credits button clicked")
 
 # Function to run the gameplay screen
 def run_gameplay_screen():
