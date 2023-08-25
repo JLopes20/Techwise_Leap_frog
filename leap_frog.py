@@ -375,6 +375,7 @@ class Health_bar:
     # Player Health display
         if not self.player.alive:
             self.screen.fill((0, 0, 0))
+            cave_frog_sprites.empty()
             game_over_sound = mixer.Sound("sounds/game_over.wav")
             game_over_sound.play()
             game_over = pygame.image.load('Images/game_over.jpg').convert()
@@ -555,7 +556,7 @@ while running:
         
         new_level.kill()
         lake = Lake(-2, 255)  # Create the Lake and its position x, y
-        lake_sprites.add(lake)  # Add lake
+        lake_sprites.add(lake, player)  # Add lake
         
         lilypad1 = LilyPad(200,500) #creating lilypads in it's positions
         lilypad2 = LilyPad(500, 350)
