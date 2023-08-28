@@ -540,10 +540,14 @@ while running:
     if player.frog_position[0] >= BG_ROAD_SIZE:
         current_background = swamp_bg
 
+    
+
 
     # Check for collision between player and cars
     for car in cars:
         if pygame.sprite.collide_mask(player, car):
+                hurt_sound = mixer.Sound("sounds/punch.wav")
+                hurt_sound.play()
                 player.health -= 10 # Reduce player's health by
                 if player.health == 0 and player.lives > 0:
                     player.lives -= 1
@@ -551,6 +555,7 @@ while running:
                 elif player.health == 0 and player.lives == 0:
                     player.alive = False
                     cave_frogs = 0
+                    
 
 
     # Check for collision between player and new_level
@@ -609,6 +614,8 @@ while running:
     player_colliding_with_alligator = False
 
     for gator in alligators_hit:
+        hurt_sound = mixer.Sound("sounds/punch.wav")
+        hurt_sound.play()
         player.health -= 10
         if player.health == 0 and player.lives > 0:
             player.lives -= 1
@@ -656,7 +663,7 @@ while running:
 
     if cave_frogs == 4:
         pygame.mixer.music.load("sounds/mixkit-completion-of-a-level-2063.wav")
-        pygame.mixer.music.play(-1)
+        pygame.mixer.music.play(1)
         pygame.mixer.music.set_volume(1)
         end_screen.main()
 
